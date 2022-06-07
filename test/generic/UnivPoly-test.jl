@@ -37,7 +37,7 @@
          V = [R(rand(-10:10)) for i in 1:5]
          nused = rand(0:3)
          W = [[rand(0:100) for i in 1:nused] for i = 1:5]
-         
+
          f1 = S(V, W)
 
          @test isa(f1, UnivPolyElem)
@@ -365,11 +365,11 @@ end
          @test f + g == g + f
          @test f + h == h + f
          @test g + h == h + g
-         
+
          @test f - g == -(g - f)
          @test f - h == -(h - f)
          @test g - h == -(h - g)
-         
+
          @test f*g == g*f
          @test f*h == h*f
          @test g*h == h*g
@@ -617,10 +617,10 @@ end
          n = rand(0:3)
          shift = [rand(0:5) for i in 1:n]
          defl = [rand(1:5) for i in 1:n]
-         
+
          fi = inflate(f, shift, defl)
 
-         @test deflate(fi, shift, defl) == f        
+         @test deflate(fi, shift, defl) == f
          @test deflate(inflate(f, defl), defl) == f
 
          shift2, defl2 = deflation(fi)
@@ -644,6 +644,22 @@ end
          shift2, defl2 = deflation(hi)
 
          @test inflate(deflate(hi, shift2, defl2), shift2, defl2) == hi
+
+         varlist = gens(S, ["x", "y", "z", "w"])
+         p = rand(S, 0:4, 0:5, -10:10)
+         vars = unique([rand(varlist) for _ in varlist])
+         shift = [rand(0:10) for _ in vars]
+         defl = [rand(1:10) for _ in vars]
+
+         @test p == deflate(inflate(p, vars, shift, defl), vars, shift, defl)
+
+         x = rand(varlist)
+         f = p + evaluate(p, [x], [1])  # otherwise f0 is usually zero
+         f0 = coeff(f, [x], [0])
+         f1 = deflate(f - f0, [x], [1], [1])
+
+         @test f == f0 + x * f1
+         @test f == f0 + inflate(f1, [x], [1], [1])
       end
    end
 end
@@ -748,7 +764,7 @@ end
             @test div(h, h) == 1
             @test div(h*f, h) == f
             @test div(h*g, h) == g
-            
+
             q, r = divrem(h, h)
             @test q == 1 && r == 0
             q, r = divrem(h*f, h)
@@ -777,7 +793,7 @@ end
 
          @test derivative(g, 1) == 9x^2*y^2 + 6x^2*y*z + 4x*y*z + 3
          @test derivative(g, 2) == 6x^3*y + 2x^3*z + 2x^2*z + 2
-         
+
          @test derivative(f, x) == 9x^2 + 4x + 1
          @test derivative(f, x2) == 9x^2 + 4x + 1
          @test derivative(f, y) == 0
@@ -1070,7 +1086,7 @@ end
 
       f1 = deepcopy(f)
       f1 = add!(f1, g, h)
-      
+
       @test f1 == g + h
 
       f2 = deepcopy(f)
